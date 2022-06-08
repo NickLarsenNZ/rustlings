@@ -8,7 +8,8 @@
 
 // Make these tests pass! Execute `rustlings hint errors6` for hints :)
 
-// I AM NOT DONE
+// This was a mind bender. Had to find the answer
+// https://github.com/suryapandian/rustlings/blob/bfc3a5a54239478df2553a46c74d0c9ee7d069f8/exercises/error_handling/errors6.rs?rgh-link-date=2021-07-25T06%3A27%3A47Z#L20-L29
 
 use std::num::ParseIntError;
 
@@ -16,21 +17,25 @@ use std::num::ParseIntError;
 #[derive(PartialEq, Debug)]
 enum ParsePosNonzeroError {
     Creation(CreationError),
-    ParseInt(ParseIntError)
+    ParseInt(ParseIntError),
 }
 
 impl ParsePosNonzeroError {
     // TODO: add another error conversion function here.
+    pub fn from_creation(e: CreationError) -> Self {
+        Self::Creation(e)
+    }
+
+    pub fn from_parseint(e: ParseIntError) -> Self {
+        Self::ParseInt(e)
+    }
 }
 
-fn parse_pos_nonzero(s: &str)
-    -> Result<PositiveNonzeroInteger, ParsePosNonzeroError>
-{
+fn parse_pos_nonzero(s: &str) -> Result<PositiveNonzeroInteger, ParsePosNonzeroError> {
     // TODO: change this to return an appropriate error instead of panicking
     // when `parse()` returns an error.
-    let x: i64 = s.parse().unwrap();
-    PositiveNonzeroInteger::new(x)
-        .map_err(ParsePosNonzeroError::from_creation)
+    let x: i64 = s.parse().map_err(ParsePosNonzeroError::from_parseint)?;
+    PositiveNonzeroInteger::new(x).map_err(ParsePosNonzeroError::from_creation)
 }
 
 // Don't change anything below this line.
@@ -49,7 +54,7 @@ impl PositiveNonzeroInteger {
         match value {
             x if x < 0 => Err(CreationError::Negative),
             x if x == 0 => Err(CreationError::Zero),
-            x => Ok(PositiveNonzeroInteger(x as u64))
+            x => Ok(PositiveNonzeroInteger(x as u64)),
         }
     }
 }
